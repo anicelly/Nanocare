@@ -1,0 +1,62 @@
+services:
+  gateway:
+    image: node:24-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../gateway:/app
+
+  websocket-service:
+    image: node:24-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - "8092:8092"
+    volumes:
+      - ../services/websocket-service:/app
+
+  hospital-core-go:
+    image: golang:1.22-alpine
+    working_dir: /app
+    command: go run .
+    ports:
+      - "8090:8090"
+    volumes:
+      - ../services/hospital-core-go:/app
+
+  triagem-ia-python:
+    image: python:3.12-slim
+    working_dir: /app
+    command: sh -c "pip install -r requirements.txt && uvicorn main:app --host 0.0.0.0 --port 8091"
+    ports:
+      - "8091:8091"
+    volumes:
+      - ../services/triagem-ia-python:/app
+
+  alert-engine:
+    image: node:24-alpine
+    working_dir: /app
+    command: node src/engine.js
+    volumes:
+      - ../services/alert-engine:/app
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: nanocare
+      POSTGRES_USER: nanocare
+      POSTGRES_PASSWORD: nanocare
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:

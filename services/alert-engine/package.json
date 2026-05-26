@@ -1,0 +1,10 @@
+{
+  "name": "nanocare-alert-engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node src/engine.js",
+    "start": "node src/engine.js"
+  }
+}
